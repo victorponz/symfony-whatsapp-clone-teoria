@@ -1,0 +1,154 @@
+I"@+<p>En esta parte del módulo vamos a implementar un clon de la aplicación Whatsapp.</p>
+
+<p>Constará de dos partes diferenciadas:</p>
+
+<ol>
+  <li>El cliente, que es tarea vuestra</li>
+  <li>El servidor que ya está implementado y puedes descargarlo <a href="https://github.com/victorponz/whatsapp-server">aquí</a></li>
+</ol>
+
+<h3 id="funcionamiento-del-cliente">Funcionamiento del cliente</h3>
+
+<h4 id="mensajes">Mensajes</h4>
+
+<ul>
+  <li>Cuando se activa uno de los chats, todos los mensajes de los participantes se cargan asíncronamente mediante una petición ajax a <code class="language-plaintext highlighter-rouge">localhost:8080/messages/from/{toUserId}</code>. El método que responde a dicha ruta debe devolver en formato <code class="language-plaintext highlighter-rouge">json</code>  todos los mensajes enviados o recibidos por <code class="language-plaintext highlighter-rouge">toUserId</code> y el usuario logeado en el sistema</li>
+  <li>Cuando se envía un mensaje, se debe hacer a la ruta <code class="language-plaintext highlighter-rouge">/post/touser/{toUserId}</code>. Como todavía no hemos conectado el servidor, para ver el nuevo mensaje hemos de recargar el chat o la página.</li>
+  <li>Os dejo un <a href="https://github.com/victorponz/whatsapp-clone-skeleton">esqueleto</a> de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades <code class="language-plaintext highlighter-rouge">User</code> y <code class="language-plaintext highlighter-rouge">Messsge</code> junto con sus repositorios.
+Una vez descargado el esqueleto, realiza una migración para que se creen las tablas.</li>
+</ul>
+
+<h4 id="contactos">Contactos</h4>
+
+<p>Los contactos también se recuperan mediante una llamada asíncrona a <code class="language-plaintext highlighter-rouge">/contacts/{userId}</code>. En esta primera versión vamos a mostrar <strong>todos</strong> los usuarios registrados.</p>
+
+<h3 id="funcionamiento-del-servidor">Funcionamiento del servidor</h3>
+
+<p>Como conocéis, Whatsapp actualiza automáticamente los mensajes cuando recibe uno nuevo. Pero, ¿cómo implementar esta funcionalidad en una aplicación web?</p>
+
+<p>En una aplicación web, el inicio de la comunicación entre un cliente y un servidor en el protocolo <code class="language-plaintext highlighter-rouge">HTTP</code> <strong>siempre</strong> lo realiza el cliente. Una vez finalizada esta comunicación se <strong>cierra</strong> la conexión.</p>
+
+<p>Así, podemos montar una función en javascript que mediante uso de <code class="language-plaintext highlighter-rouge">setTimeOut</code> llamase a un api que recuperase los nuevos mensajes. Pero claro, en cuánto tiempo fijo el <code class="language-plaintext highlighter-rouge">timeout</code>: 1/2 segundo, 1 segundo…. Seguramente si llamo muy deprisa, la mayoría de veces no habrá mensajes nuevos mientras que si lo hago más lento los recuperaré en paquetes.</p>
+
+<p>Es mejor usar una tecnología llamada <a href="https://developer.mozilla.org/es/docs/Web/API/WebSockets_API">websockets</a>. En este caso, se inicia un canal de comunicación bidireccional que se mantiene <strong>siempre abierto</strong>. Ahora el servidor y el cliente están continuamente <em>escuchando</em> la llegada de nuevos mensajes.</p>
+
+<p>Para lanzar el servidor desde la raíz del proyecto, usa este comando:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre> php -q bin/server port:9000
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Esto iniciará el servidor y empezará a escuchar la conexión de nuevos usuarios.</p>
+
+<p>Conectar el cliente es muy sencillo:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="rouge-code"><pre><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><span class="nx">ç</span>
+	<span class="c1">//Open a WebSocket connection.</span>
+	<span class="nx">websocket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="dl">"</span><span class="s2">ws://localhost:9000/</span><span class="dl">"</span><span class="p">);</span>
+	
+    <span class="c1">//Connected to server</span>
+	<span class="nx">websocket</span><span class="p">.</span><span class="nx">onopen</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Connected to server </span><span class="dl">'</span><span class="p">);</span>
+	<span class="p">}</span>
+    
+    <span class="c1">//Connection close</span>
+	<span class="nx">websocket</span><span class="p">.</span><span class="nx">onclose</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span> 
+    	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Disconnected</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="nx">websocket</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span> 
+        <span class="kd">var</span> <span class="nx">response</span> 		<span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">evt</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span> <span class="c1">//PHP sends Json data</span>
+        <span class="c1">//hacer lo que corresponda con response</span>
+    <span class="p">};</span>
+     
+    <span class="c1">//Error</span>
+	<span class="nx">websocket</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span> 
+    	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Error </span><span class="dl">'</span><span class="o">+</span><span class="nx">ev</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="p">};</span>
+    
+<span class="p">});</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Ahora, cada vez que el servidor nos envíe un mensaje llegará al evento <code class="language-plaintext highlighter-rouge">websocket.onmessage</code></p>
+
+<p>El servidor envía dos tipos de mensajes que debéis tratar:</p>
+
+<ul>
+  <li>
+    <p>Cuando se conecta un nuevo usuario, envía el siguiente mensaje:</p>
+
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"usermsg"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"userName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sonia"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"info"</span><span class="p">:</span><span class="w"> </span><span class="s2">"soy Sonia"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"image"</span><span class="p">:</span><span class="w"> </span><span class="s2">"719SdJJgEoL-AC-SX425-63c6deb1056ed.jpg"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Cuando llega un mensaje nuevo hace un <code class="language-plaintext highlighter-rouge">broadcasting</code> del mismo y envía el siguiente <code class="language-plaintext highlighter-rouge">json</code></p>
+
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"chatmsg"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"toUserId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"fromUserId"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hola"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023-01-17 10:42:44.000000"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"timezone_type"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"timezone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Europe/Berlin"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"fromUserName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"yo"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div>    </div>
+
+    <blockquote>
+      <p>-warning-En una aplicación real usaríamos otras aproximaciones, como colas de mensajes, <a href="https://socket.io/">socket.io</a>, etc</p>
+    </blockquote>
+  </li>
+</ul>
+
+:ET
