@@ -1,4 +1,3 @@
----
 typora-copy-images-to: ../../assets/img/primeros-pasos/
 typora-root-url: ../../
 title: Symfony Whatsapp clone
@@ -19,7 +18,7 @@ Constará de dos partes diferenciadas:
 
 * Cuando se activa uno de los chats, todos los mensajes de los participantes se cargan asíncronamente mediante una petición ajax a `localhost:8080/messages/from/{toUserId}`. El método que responde a dicha ruta debe devolver en formato `json`  todos los mensajes enviados o recibidos por `toUserId` y el usuario logeado en el sistema
 * Cuando se envía un mensaje, se debe hacer a la ruta `/post/touser/{toUserId}`. Como todavía no hemos conectado el servidor, para ver el nuevo mensaje hemos de recargar el chat o la página.
-* Os dejo un [esqueleto](https://github.com/victorponz/whatsapp-clone-skeleton) de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades `User` y `Messsge` junto con sus repositorios.
+* Os dejo un [esqueleto](https://github.com/victorponz/whatsapp-clone-skeleton) de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades `User` y `Message` junto con sus repositorios.
   Una vez descargado el esqueleto, realiza una migración para que se creen las tablas.
 
 #### Contactos
@@ -32,7 +31,7 @@ Como conocéis, Whatsapp actualiza automáticamente los mensajes cuando recibe u
 
 En una aplicación web, el inicio de la comunicación entre un cliente y un servidor en el protocolo `HTTP` **siempre** lo realiza el cliente. Una vez finalizada esta comunicación se **cierra** la conexión.
 
-Así, podemos montar una función en javascript que mediante uso de `setTimeOut` llamase a un api que recuperase los nuevos mensajes. Pero claro, en cuánto tiempo fijo el `timeout`: 1/2 segundo, 1 segundo.... Seguramente si llamo muy deprisa, la mayoría de veces no habrá mensajes nuevos mientras que si lo hago más lento los recuperaré en paquetes.
+Así, podemos montar una función en javascript que mediante uso de `setTimeOut` llamase a un api que recuperase los nuevos mensajes. Pero claro, en cuánto tiempo fijo el `timeout`: 1/2 segundo, 1 segundo.... Seguramente si llamo muy deprisa, la mayoría de veces no habrá mensajes nuevos mientras que si lo hago más lento los recuperaré en paquetes. Este tipo de funcionamiento se denomina [polling](https://en.wikipedia.org/wiki/Polling_(computer_science))
 
 Es mejor usar una tecnología llamada [websockets](https://developer.mozilla.org/es/docs/Web/API/WebSockets_API). En este caso, se inicia un canal de comunicación bidireccional que se mantiene **siempre abierto**. Ahora el servidor y el cliente están continuamente *escuchando* la llegada de nuevos mensajes.
 
@@ -47,7 +46,7 @@ Esto iniciará el servidor y empezará a escuchar la conexión de nuevos usuario
 Conectar el cliente es muy sencillo:
 
 ```javascript
-$(document).ready(function(){ç
+$(document).ready(function(){
 	//Open a WebSocket connection.
 	websocket = new WebSocket("ws://localhost:9000/");
 	
