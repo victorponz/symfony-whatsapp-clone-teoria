@@ -125,7 +125,7 @@
 <ul>
   <li>Cuando se activa uno de los chats, todos los mensajes de los participantes se cargan asíncronamente mediante una petición ajax a <code class="language-plaintext highlighter-rouge">localhost:8080/messages/from/{toUserId}</code>. El método que responde a dicha ruta debe devolver en formato <code class="language-plaintext highlighter-rouge">json</code>  todos los mensajes enviados o recibidos por <code class="language-plaintext highlighter-rouge">toUserId</code> y el usuario logeado en el sistema</li>
   <li>Cuando se envía un mensaje, se debe hacer a la ruta <code class="language-plaintext highlighter-rouge">/post/touser/{toUserId}</code>. Como todavía no hemos conectado el servidor, para ver el nuevo mensaje hemos de recargar el chat o la página.</li>
-  <li>Os dejo un <a href="https://github.com/victorponz/whatsapp-clone-skeleton">esqueleto</a> de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades <code class="language-plaintext highlighter-rouge">User</code> y <code class="language-plaintext highlighter-rouge">Messsge</code> junto con sus repositorios.
+  <li>Os dejo un <a href="https://github.com/victorponz/whatsapp-clone-skeleton">esqueleto</a> de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades <code class="language-plaintext highlighter-rouge">User</code> y <code class="language-plaintext highlighter-rouge">Message</code> junto con sus repositorios.
 Una vez descargado el esqueleto, realiza una migración para que se creen las tablas.</li>
 </ul>
 
@@ -139,7 +139,7 @@ Una vez descargado el esqueleto, realiza una migración para que se creen las ta
 
 <p>En una aplicación web, el inicio de la comunicación entre un cliente y un servidor en el protocolo <code class="language-plaintext highlighter-rouge">HTTP</code> <strong>siempre</strong> lo realiza el cliente. Una vez finalizada esta comunicación se <strong>cierra</strong> la conexión.</p>
 
-<p>Así, podemos montar una función en javascript que mediante uso de <code class="language-plaintext highlighter-rouge">setTimeOut</code> llamase a un api que recuperase los nuevos mensajes. Pero claro, en cuánto tiempo fijo el <code class="language-plaintext highlighter-rouge">timeout</code>: 1/2 segundo, 1 segundo…. Seguramente si llamo muy deprisa, la mayoría de veces no habrá mensajes nuevos mientras que si lo hago más lento los recuperaré en paquetes.</p>
+<p>Así, podemos montar una función en javascript que mediante uso de <code class="language-plaintext highlighter-rouge">setTimeOut</code> llamase a un api que recuperase los nuevos mensajes. Pero claro, en cuánto tiempo fijo el <code class="language-plaintext highlighter-rouge">timeout</code>: 1/2 segundo, 1 segundo…. Seguramente si llamo muy deprisa, la mayoría de veces no habrá mensajes nuevos mientras que si lo hago más lento los recuperaré en paquetes. Este tipo de funcionamiento se denomina <a href="https://en.wikipedia.org/wiki/Polling_(computer_science)">polling</a></p>
 
 <p>Es mejor usar una tecnología llamada <a href="https://developer.mozilla.org/es/docs/Web/API/WebSockets_API">websockets</a>. En este caso, se inicia un canal de comunicación bidireccional que se mantiene <strong>siempre abierto</strong>. Ahora el servidor y el cliente están continuamente <em>escuchando</em> la llegada de nuevos mensajes.</p>
 
@@ -177,7 +177,7 @@ Una vez descargado el esqueleto, realiza una migración para que se creen las ta
 22
 23
 24
-</pre></td><td class="rouge-code"><pre><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><span class="nx">ç</span>
+</pre></td><td class="rouge-code"><pre><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
 	<span class="c1">//Open a WebSocket connection.</span>
 	<span class="nx">websocket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="dl">"</span><span class="s2">ws://localhost:9000/</span><span class="dl">"</span><span class="p">);</span>
 	
