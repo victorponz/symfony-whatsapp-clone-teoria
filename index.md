@@ -77,7 +77,7 @@ Ahora, cada vez que el servidor nos envíe un mensaje llegará al evento `websoc
 
 El servidor envía dos tipos de mensajes que debéis tratar:
 
-* Cuando se conecta un nuevo usuario, envía el siguiente mensaje:
+* Cuando se da de alta un nuevo usuario, envía el siguiente mensaje mediante `broadcasting`:
 
   ```json
   {
@@ -89,7 +89,7 @@ El servidor envía dos tipos de mensajes que debéis tratar:
   }
   ```
 
-* Cuando llega un mensaje nuevo hace un `broadcasting` del mismo y envía el siguiente `json`
+* Cuando llega un mensaje nuevo, envía el siguiente mensaje al emisor y al receptor:
 
   ```json
   {
@@ -102,11 +102,13 @@ El servidor envía dos tipos de mensajes que debéis tratar:
       "timezone_type": 3,
       "timezone": "Europe/Berlin"
     },
-    "fromUserName": "yo"
+    "fromUserName": "Pepe"
   }
   ```
 
 
-  > -warning-En una aplicación real usaríamos otras aproximaciones, como colas de mensajes, [socket.io](https://socket.io/), etc
+> -alert-Este servidor es de _andar por casa_ y hecho con el sólo  propósito de crear un clon casero de Whatsapp.
+>
+>  En una aplicación real usaríamos otras aproximaciones, [https://www.rabbitmq.com/](como colas de mensajes), [socket.io](https://socket.io/), etc
 
   

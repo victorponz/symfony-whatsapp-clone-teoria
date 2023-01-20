@@ -1,21 +1,24 @@
 #subject-container .subject-details{
-    font-family: 'EB Garamond', serif;
-    font-size: 20px;
+    afont-family: 'EB Garamond', serif;
+    afont-size: 20px;
     color: var(--text-color);
    }
   #subject-container h1 {
   width: 100%;
   font-family: 'Bebas Neue', cursive;
-  font-size: 80px;
   scolor: var(--text-color);
   color: var(--primary-color);
-  text-shadow:
+ }
+ #subject-container h1.indice{
+  font-size: 80px;
+   text-shadow:
   0px 0px 0 black,
   -2px -2px 0 black,  
   2px -2px 0 black,
   -2px 2px 0 black,
    2px 2px 0 black;
   }
+  
   #subject-container h2 {
   width: 100%;
   font-family: 'Bebas Neue', cursive;
@@ -75,9 +78,10 @@
   .navbar .nav-menu.active{
     background-color: var(--bg-primary);
   }
-  #write ul{
+  #write > ul{
     list-style: initial;
     padding-left: 28px;
+    margin-bottom: 40px;
   }
   #subject-container .subject-details table{
     color:unset;
@@ -137,4 +141,9 @@
 
 a {
   text-decoration: none;
+}
+
+#content blockquote{
+	margin-top:8px;
+	margin-bottom:8px;
 }
