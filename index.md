@@ -20,7 +20,7 @@ Constará de dos partes diferenciadas:
 * Cuando se activa uno de los chats, todos los mensajes de los participantes se cargan asíncronamente mediante una petición ajax a `localhost:8080/messages/from/{toUserId}`. El método que responde a dicha ruta debe devolver en formato `json`  todos los mensajes enviados o recibidos por `toUserId` y el usuario logeado en el sistema
 * Cuando se envía un mensaje, se debe hacer a la ruta `/post/touser/{toUserId}`. Como todavía no hemos conectado el servidor, para ver el nuevo mensaje hemos de recargar el chat o la página.
 * Os dejo un [esqueleto](https://github.com/victorponz/whatsapp-clone-skeleton) de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades `User` y `Message` junto con sus repositorios.
-  Una vez descargado el esqueleto, realiza una migración para que se creen las tablas.
+Una vez descargado el esqueleto debes instalar las dependencias de paquetes con el comando `composer install` que debes ejecutar en la raíz del proyecto y realizar una migración para que se creen las tablas. 
 
 #### Contactos
 
