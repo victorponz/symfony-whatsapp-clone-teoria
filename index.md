@@ -20,7 +20,7 @@ Constará de dos partes diferenciadas:
 * Cuando se activa uno de los chats, todos los mensajes de los participantes se deben cargar asíncronamente mediante una petición ajax a `localhost:8080/messages/from/{toUserId}`. El método que responde a dicha ruta debe devolver en formato `json`  todos los mensajes enviados o recibidos por `toUserId` y el usuario logeado en el sistema
 * Cuando se envía un mensaje, se debe hacer a la ruta `/post/touser/{toUserId}`. Como todavía no hemos conectado el servidor, para ver el nuevo mensaje hemos de recargar el chat o la página.
 * Os dejo un [esqueleto](https://github.com/victorponz/whatsapp-clone-skeleton) de la aplicación cliente, que contiene todo lo necesario para poder empezar, incluida una plantilla, y las entidades `User` y `Message` junto con sus repositorios.
-Una vez descargado el esqueleto debes instalar las dependencias de paquetes con el comando `composer install` que debes ejecutar en la raíz del proyecto y realizar una migración para que se creen las tablas. 
+Una vez descargado el esqueleto debes instalar las dependencias de paquetes con el comando `composer install` que debes ejecutar en la raíz del proyecto y realizar una migración para que se creen las tablas.
 * El servidor está continuamente escuchando cambios en la base de datos y cuando encuentra un mensaje nuevo lo envía al emisor y al receptor que deben estar escuchando para incorporarlo al chat entre ellos. Si se encuentra un nuevo usuario, lo envía a todos los usuarios, que deben estar escuchando y agregarlo a la lista de mensajes.
 
 #### Contactos
@@ -51,26 +51,26 @@ Conectar el cliente es muy sencillo:
 $(document).ready(function(){
 	//Open a WebSocket connection.
 	websocket = new WebSocket("ws://localhost:9000/");
-	
+
     //Connected to server
 	websocket.onopen = function(ev) {
 		console.log('Connected to server ');
 	}
-    
+
     //Connection close
-	websocket.onclose = function(ev) { 
+	websocket.onclose = function(ev) {
     	console.log('Disconnected');
     };
-    websocket.onmessage = function(evt) { 
+    websocket.onmessage = function(evt) {
         var response 		= JSON.parse(evt.data); //PHP sends Json data
         //hacer lo que corresponda con response
     };
-     
+
     //Error
-	websocket.onerror = function(ev) { 
+	websocket.onerror = function(ev) {
     	console.log('Error '+ev.data);
     };
-    
+
 });
 ```
 
@@ -106,7 +106,17 @@ El servidor envía dos tipos de mensajes que debéis tratar:
     "fromUserName": "Pepe"
   }
   ```
-
+* Para que el serviddor _sepa_ a que usuario enviar los mensajes, hemos de enviarle el siguiente mensaje:
+```javascript
+  //prepare json data
+   var msg = {
+       type: 'chatData',
+       fromUserId: userId,
+       toUserId: contactId
+   };
+   //convert and send data to server
+   websocket.send(JSON.stringify(msg));
+```
 
 > -alert-Este servidor es de _andar por casa_ y hecho con el sólo  propósito de crear un clon casero de Whatsapp.
 >
@@ -132,9 +142,9 @@ Para pintar los contactos y los mensajes vamos a usar plantillas que definan el 
             </p>
             <p class="contact-numMessages hidden text-xs text-grey-darkest" style="background-color: #04AA6D; color: white; padding: 4px 8px;text-align: center; border-radius: 5px;">
                 0
-            </p> 
+            </p>
             </div>          
-           
+
         </div>
         <p class="contact.info text-grey-dark mt-1 text-sm">
             Get Andrés on this movie ASAP!
@@ -162,4 +172,3 @@ function createDOMContact(m){
     //Ya solo te falta añadir los eventos clic
   }
 ```
-
